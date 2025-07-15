@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const authData = {
+const user = {
   email: "anshuman.23.2004@gmail.com",
   name: "Anshuman Bhandari",
   rollNo: "2218415",
@@ -9,9 +9,9 @@ const authData = {
   clientSecret: "bajRuRrerpYwGCcK"
 };
 
-axios.post('http://20.244.56.144/evaluation-service/auth', authData)
-  .then(response => {
-    const token = response.data.access_token;
+axios.post('http://20.244.56.144/evaluation-service/auth', user)
+  .then(res => {
+    const token = res.data.access_token;
     console.log("Bearer Token:", token);
     return axios.get('http://20.244.56.144/evaluation-service/some-protected-route', {
       headers: {
@@ -20,8 +20,8 @@ axios.post('http://20.244.56.144/evaluation-service/auth', authData)
     });
   })
   .then(res => {
-    console.log("Protected API response:", res.data);
+    console.log("API Response:", res.data);
   })
-  .catch(error => {
-    console.error("Error:", error.response?.data || error.message);
+  .catch(err => {
+    console.error("Error:", err.response?.data || err.message);
   });

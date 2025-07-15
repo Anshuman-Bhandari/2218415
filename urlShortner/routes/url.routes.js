@@ -1,16 +1,14 @@
 import express from 'express';
 import {
-  createShortUrl,
-  redirectToLongUrl,
-  getUrlStats
+  generateShortUrl,
+  handleRedirect,
+  showStats
 } from '../controllers/url.controller.js';
-
 
 const router = express.Router();
 
-router.post('/shorturls', createShortUrl);
-router.get('/:code', redirectToLongUrl);
-router.get('/shorturls/:code', getUrlStats);
-
+router.post('/shorturls', generateShortUrl);
+router.get('/:code', handleRedirect);
+router.get('/shorturls/:code', showStats);
 
 export default router;

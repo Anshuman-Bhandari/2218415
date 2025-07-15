@@ -1,18 +1,18 @@
 import { Log } from '../services/logService.js';
 
-const loggerMiddleware = async (req, res, next) => {
-  const start = Date.now();
+const logRequest = async (req, res, next) => {
+  const begin = Date.now();
 
   res.on('finish', async () => {
-    const duration = Date.now() - start;
-    await Log("backend", "info", "middleware", `Handled ${req.method} ${req.originalUrl} in ${duration}ms`);
+    const timeTaken = Date.now() - begin;
+    await Log("backend", "info", "middleware", `${req.method} ${req.originalUrl} took ${timeTaken}ms`);
 
     if (res.statusCode >= 400) {
-      await Log("backend", "error", "middleware", `Error ${res.statusCode} on ${req.originalUrl}`);
+      await Log("backend", "error", "middleware", `Status ${res.statusCode} at ${req.originalUrl}`);
     }
   });
 
   next();
 };
 
-export default loggerMiddleware;
+export default logRequest;

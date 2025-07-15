@@ -1,62 +1,61 @@
-import { recordClick } from '../db/store.js';
-import { getStats } from '../db/store.js';
+import { recordClick, getStats, saveUrl, exists } from '../db/store.js';
 import { Log } from '../logService.js';
-import { saveUrl, exists } from '../db/store.js';
 import { generateShortCode } from '../utils/shortener.js';
 
+// Redirect to the original URL using shortcode
+export const goToOriginalUrl = async (req, res) => {
+  const shortCode = req.params.code;
+  const fullUrl = getUrl(shortCode);
 
-export const redirectToLongUrl = async (req, res) => {
-  const code = req.params.code;
-  const data = getUrl(code);
-
-  if (!data) {
-    await Log("backend", "warn", "url", `Shortcode '${code}' not found or expired`);
+  if (!fullUrl) {
+    await Log("backend", "warn", "url", `Code '${shortCode}' not found or expired`);
     return res.status(404).json({ error: "Short URL not found or expired" });
   }
 
-  const referrer = req.get("Referrer") || "direct";
-  recordClick(code, referrer, "IN"); 
-  await Log("backend", "info", "url", `Redirected '${code}'`);
-  res.redirect(data);
+  const source = req.get("Referrer") || "direct";
+  recordClick(shortCode, source, "IN");
+  await Log("backend", "info", "url", `Redirected using code '${shortCode}'`);
+  res.redirect(fullUrl);
 };
 
-export const getUrlStats = async (req, res) => {
-  const code = req.params.code;
-  const stats = getStats(code);
+// Get usage stats for a given shortcode
+export const fetchUrlStats = async (req, res) => {
+  const shortCode = req.params.code;
+  const urlStats = getStats(shortCode);
 
-  if (!stats) {
-    await Log("backend", "warn", "url", `Stats not found for '${code}'`);
+  if (!urlStats) {
+    await Log("backend", "warn", "url", `No stats found for '${shortCode}'`);
     return res.status(404).json({ error: "Shortcode not found" });
   }
 
-  await Log("backend", "info", "url", `Stats served for '${code}'`);
-  res.status(200).json(stats);
+  await Log("backend", "info", "url", `Fetched stats for '${shortCode}'`);
+  res.status(200).json(urlStats);
 };
 
-
-export const createShortUrl = async (req, res) => {
+// Create a new short URL
+export const makeShortUrl = async (req, res) => {
   try {
     const { url, validity = 30, shortcode } = req.body;
 
     if (!url || typeof url !== 'string') {
-      await Log("backend", "error", "url", "Invalid or missing URL");
-      return res.status(400).json({ error: "Invalid URL" });
+      await Log("backend", "error", "url", "Invalid URL input");
+      return res.status(400).json({ error: "Please provide a valid URL" });
     }
 
     const code = generateShortCode(shortcode);
-    const now = new Date();
-    const expiryDate = new Date(now.getTime() + validity * 60000); 
+    const currentTime = new Date();
+    const endTime = new Date(currentTime.getTime() + validity * 60000);
 
-    saveUrl(code, url, expiryDate);
+    saveUrl(code, url, endTime);
 
-    await Log("backend", "info", "url", `Shortened URL '${url}' to '${code}' for ${validity} minutes`);
+    await Log("backend", "info", "url", `Created short URL '${code}' for '${url}' valid for ${validity} mins`);
 
     res.status(201).json({
       shortLink: `http://localhost:3000/${code}`,
-      expiry: expiryDate.toISOString()
+      expiry: endTime.toISOString()
     });
-  } catch (err) {
-    await Log("backend", "fatal", "url", "Failed to create short URL");
-    res.status(500).json({ error: "Something went wrong" });
+  } catch (error) {
+    await Log("backend", "fatal", "url", "Error while making short URL");
+    res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -1,13 +1,13 @@
 import { nanoid } from 'nanoid';
 import { exists } from '../db/store.js';
 
-export const generateShortCode = (customCode = null) => {
-  if (customCode && !exists(customCode)) return customCode;
+export const generateShortCode = (inputCode = null) => {
+  if (inputCode && !exists(inputCode)) return inputCode;
 
-  let code;
+  let newCode;
   do {
-    code = nanoid(7);
-  } while (exists(code));
+    newCode = nanoid(7);
+  } while (exists(newCode));
 
-  return code;
+  return newCode;
 };

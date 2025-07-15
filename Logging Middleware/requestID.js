@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const data = {
+const userInfo = {
   email: "anshuman.23.2004@gmail.com",
   name: "Anshuman Bhandari",
   mobileNo: "9557868051",
@@ -9,10 +9,10 @@ const data = {
   accessCode: "QAhDUr"
 };
 
-axios.post('http://20.244.56.144/evaluation-service/register', data)
-  .then(response => {
-    console.log('Response:', response.data);
+axios.post('http://20.244.56.144/evaluation-service/register', userInfo)
+  .then(res => {
+    console.log("Response:", res.data);
   })
-  .catch(error => {
-    console.error('Error:', error.response?.data || error.message);
+  .catch(err => {
+    console.error("Error:", err.response?.data || err.message);
   });

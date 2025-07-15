@@ -1,46 +1,58 @@
-const store = new Map(); // shortCode -> { longUrl, createdAt, expiresAt, clicks: [] }
+import { recordClick, getStats, saveUrl, exists } from '../db/store.js';
+import { Log } from '../logService.js';
+import { generateShortCode } from '../utils/shortener.js';
 
-export const saveUrl = (code, longUrl, expiresAt) => {
-  store.set(code, {
-    longUrl,
-    createdAt: new Date(),
-    expiresAt,
-    clicks: []
-  });
-};
+export const handleRedirect = async (req, res) => {
+  const code = req.params.code;
+  const link = getUrl(code);
 
-export const getUrl = (code) => {
-  const data = store.get(code);
-  if (!data) return null;
-  if (new Date() > data.expiresAt) {
-    store.delete(code);
-    return null;
+  if (!link) {
+    await Log("backend", "warn", "url", `Code '${code}' missing or expired`);
+    return res.status(404).json({ error: "Not found or expired" });
   }
-  return data.longUrl;
+
+  const from = req.get("Referrer") || "direct";
+  recordClick(code, from, "IN");
+  await Log("backend", "info", "url", `Used '${code}' for redirect`);
+  res.redirect(link);
 };
 
-export const exists = (code) => {
-  return store.has(code);
+export const showStats = async (req, res) => {
+  const code = req.params.code;
+  const info = getStats(code);
+
+  if (!info) {
+    await Log("backend", "warn", "url", `No data for '${code}'`);
+    return res.status(404).json({ error: "No data found" });
+  }
+
+  await Log("backend", "info", "url", `Stats shown for '${code}'`);
+  res.status(200).json(info);
 };
 
-export const recordClick = (code, referrer = "unknown", location = "IN") => {
-  const data = store.get(code);
-  if (!data) return;
-  data.clicks.push({
-    timestamp: new Date().toISOString(),
-    referrer,
-    location
-  });
-};
+export const generateShortUrl = async (req, res) => {
+  try {
+    const { url, validity = 30, shortcode } = req.body;
 
-export const getStats = (code) => {
-  const data = store.get(code);
-  if (!data) return null;
-  return {
-    originalUrl: data.longUrl,
-    createdAt: data.createdAt,
-    expiry: data.expiresAt,
-    clickCount: data.clicks.length,
-    clickDetails: data.clicks
-  };
+    if (!url || typeof url !== 'string') {
+      await Log("backend", "error", "url", "Bad input");
+      return res.status(400).json({ error: "Invalid URL" });
+    }
+
+    const code = generateShortCode(shortcode);
+    const now = new Date();
+    const expires = new Date(now.getTime() + validity * 60000);
+
+    saveUrl(code, url, expires);
+
+    await Log("backend", "info", "url", `Made '${code}' for '${url}'`);
+
+    res.status(201).json({
+      shortLink: `http://localhost:3000/${code}`,
+      expiry: expires.toISOString()
+    });
+  } catch (err) {
+    await Log("backend", "fatal", "url", "Could not shorten");
+    res.status(500).json({ error: "Something went wrong" });
+  }
 };
