@@ -1,4 +1,3 @@
-// middlewares/logger.js
 import { Log } from '../services/logService.js';
 
 const loggerMiddleware = async (req, res, next) => {

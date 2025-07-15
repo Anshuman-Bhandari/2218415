@@ -1,4 +1,3 @@
-// services/logService.js
 import axios from 'axios';
 
 export const Log = async (stack, level, packageName, message) => {
@@ -10,7 +9,5 @@ export const Log = async (stack, level, packageName, message) => {
       message
     });
   } catch (error) {
-    // You can't use console.log
-    // optionally retry or store locally if needed
   }
 };

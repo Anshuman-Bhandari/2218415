@@ -15,8 +15,7 @@ export const redirectToLongUrl = async (req, res) => {
   }
 
   const referrer = req.get("Referrer") || "direct";
-  recordClick(code, referrer, "IN"); // Static "IN" for location unless using IP lookup
-
+  recordClick(code, referrer, "IN"); 
   await Log("backend", "info", "url", `Redirected '${code}'`);
   res.redirect(data);
 };
@@ -46,7 +45,7 @@ export const createShortUrl = async (req, res) => {
 
     const code = generateShortCode(shortcode);
     const now = new Date();
-    const expiryDate = new Date(now.getTime() + validity * 60000); // validity in ms
+    const expiryDate = new Date(now.getTime() + validity * 60000); 
 
     saveUrl(code, url, expiryDate);
 

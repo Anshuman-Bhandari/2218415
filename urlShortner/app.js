@@ -1,4 +1,3 @@
-// app.js
 import express from 'express';
 import loggingMiddleware from './middlewares/logger.js';
 import urlRoutes from './routes/url.routes.js';

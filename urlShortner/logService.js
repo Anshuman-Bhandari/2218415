@@ -9,7 +9,6 @@ export async function Log(stack, level, pkg, message) {
       body: JSON.stringify({ stack, level, package: pkg, message })
     });
 
-    // Optionally log to debug (REMOVE in production)
     console.log(`[LOG] ${level} - ${pkg}: ${message}`);
   } catch (err) {
     console.error("Logging failed:", err.message);
