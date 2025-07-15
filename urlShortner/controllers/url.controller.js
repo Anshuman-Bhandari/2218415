@@ -1,6 +1,6 @@
 import { save, get, stats, addHit, has } from '../db/store.js'
 import { makeCode } from '../utils/shortener.js'
-import { log } from '../logging-middleware/logService.js'
+import { log } from '../../logging-middleware/logService.js'
 
 export const createShortUrl = async (req, res) => {
   try {

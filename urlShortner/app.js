@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import { requestLogger } from './logging-middleware/logger.middleware.js'
+import { requestLogger } from '../logging-middleware/logger.middleware.js'
 import urlRoutes from './routes/url.routes.js'
 
 const app = express()
