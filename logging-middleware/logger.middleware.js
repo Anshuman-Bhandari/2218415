@@ -1,7 +1,8 @@
-import { Log } from './logService.js';
+import { log } from './logService.js'
 
-export const logReq = async (req, res, next) => {
+
+export const requestLogger = async (req, res, next) => {
   const msg = req.method + ' ' + req.url + ' ' + req.ip;
-  await Log('backend', 'info', 'req', msg);
+  await log('backend', 'info', 'req', msg);
   next();
 };
