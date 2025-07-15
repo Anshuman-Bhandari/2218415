@@ -1,9 +1,8 @@
-// urlshortner/utils/shortener.js
-export const generateShortCode = () => {
-  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
+export const makeCode = () => {
+  const s = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  let c = ''
   for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+    c += s.charAt(Math.floor(Math.random() * s.length))
   }
-  return code;
-};
+  return c
+}

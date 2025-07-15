@@ -1,31 +1,29 @@
-// logging-middleware/logService.js
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
+import fetch from 'node-fetch'
+import dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
-const LOGGING_API = 'http://20.244.56.144/evaluation-service/log';
-const TOKEN = process.env.LOGGING_API_TOKEN;
+const url = 'http://20.244.56.144/evaluation-service/log'
+const key = process.env.LOGGING_API_TOKEN
 
-export async function Log(stack, level, pkg, message) {
+export async function log(x, y, z, msg) {
   try {
-    await fetch(LOGGING_API, {
+    await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${TOKEN}`,
+        'Authorization': `Bearer ${key}`,
       },
       body: JSON.stringify({
-        stack,
-        level,
-        package: pkg,
-        message,
+        stack: x,
+        level: y,
+        package: z,
+        message: msg,
       }),
-    });
+    })
 
-    // Optional: local debug output
-    console.log(`[${level.toUpperCase()}] ${pkg}: ${message}`);
-  } catch (err) {
-    console.error('[LOGGING ERROR]', err.message);
+    console.log(`[${y}] ${z}: ${msg}`)
+  } catch (e) {
+    console.error('err', e.message)
   }
 }

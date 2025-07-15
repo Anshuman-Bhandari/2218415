@@ -1,47 +1,46 @@
-// urlshortner/db/store.js
-const store = new Map();
+const db = new Map()
 
-export const saveUrl = (code, longUrl, expiresAt) => {
-  store.set(code, {
-    longUrl,
-    createdAt: new Date(),
-    expiresAt,
-    clicks: []
-  });
-};
+export const save = (k, v, t) => {
+  db.set(k, {
+    long: v,
+    created: new Date(),
+    end: t,
+    hits: []
+  })
+}
 
-export const getUrl = (code) => {
-  const data = store.get(code);
-  if (!data) return null;
-  if (new Date() > data.expiresAt) {
-    store.delete(code);
-    return null;
+export const get = (k) => {
+  const d = db.get(k)
+  if (!d) return null
+  if (new Date() > d.end) {
+    db.delete(k)
+    return null
   }
-  return data.longUrl;
-};
+  return d.long
+}
 
-export const exists = (code) => {
-  return store.has(code);
-};
+export const has = (k) => {
+  return db.has(k)
+}
 
-export const recordClick = (code, referrer = "unknown", location = "IN") => {
-  const data = store.get(code);
-  if (!data) return;
-  data.clicks.push({
-    timestamp: new Date().toISOString(),
-    referrer,
-    location
-  });
-};
+export const addHit = (k, from = 'unknown', loc = 'IN') => {
+  const d = db.get(k)
+  if (!d) return
+  d.hits.push({
+    time: new Date().toISOString(),
+    from,
+    loc
+  })
+}
 
-export const getStats = (code) => {
-  const data = store.get(code);
-  if (!data) return null;
+export const stats = (k) => {
+  const d = db.get(k)
+  if (!d) return null
   return {
-    originalUrl: data.longUrl,
-    createdAt: data.createdAt,
-    expiry: data.expiresAt,
-    clickCount: data.clicks.length,
-    clickDetails: data.clicks
-  };
-};
+    url: d.long,
+    made: d.created,
+    till: d.end,
+    count: d.hits.length,
+    list: d.hits
+  }
+}

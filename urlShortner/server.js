@@ -1,11 +1,10 @@
-// urlshortner/server.js
-import dotenv from 'dotenv';
-import app from './app.js';
+import dotenv from 'dotenv'
+import app from './app.js'
 
-dotenv.config();
+dotenv.config()
 
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+app.listen(port, () => {
+  console.log(`Server on http://localhost:${port}`)
+})
