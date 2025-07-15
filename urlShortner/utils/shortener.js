@@ -1,13 +1,9 @@
-import { nanoid } from 'nanoid';
-import { exists } from '../db/store.js';
-
-export const generateShortCode = (inputCode = null) => {
-  if (inputCode && !exists(inputCode)) return inputCode;
-
-  let newCode;
-  do {
-    newCode = nanoid(7);
-  } while (exists(newCode));
-
-  return newCode;
+// urlshortner/utils/shortener.js
+export const generateShortCode = () => {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
 };
